@@ -7,7 +7,7 @@ import Link from "next/link";
 import { ArrowLeft, Edit, Trash2, Plus, BookOpen } from "lucide-react";
 import Experience from "@/components/3d/Experience";
 import { useRouter } from "next/navigation";
-import AuthModal from "@/components/auth/AuthModal";
+import Navbar from '@/components/layout/Navbar';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -52,6 +52,8 @@ export default function DashboardPage() {
         <div className="absolute inset-0 bg-black/80" />
       </div>
 
+      <Navbar />
+
       <div className="max-w-6xl mx-auto p-6">
         <header className="flex items-center justify-between mb-8 bg-black/40 backdrop-blur-md p-4 rounded-2xl border border-white/10">
             <div className="flex items-center gap-4">
@@ -66,7 +68,6 @@ export default function DashboardPage() {
                <Link href="/publish" className="flex items-center gap-2 px-6 py-3 bg-purple-600 rounded-full hover:bg-purple-700 transition font-bold text-white shadow-lg shadow-purple-500/20">
                    <Plus size={20} /> Create New Story
                </Link>
-               <AuthModal />
             </div>
         </header>
 

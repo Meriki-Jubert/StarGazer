@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import Experience from '@/components/3d/Experience'; 
 import StoriesFeed from '@/components/stories/StoriesFeed';
-import AuthModal from '@/components/auth/AuthModal';
+import Navbar from '@/components/layout/Navbar';
 
 export default function ReadPage() {
   return (
@@ -13,9 +13,10 @@ export default function ReadPage() {
           <div className="absolute inset-0 bg-black/80" />
        </div>
 
-      {/* Header */}
-      <header className="p-6 border-b border-white/10 flex items-center justify-between sticky top-0 bg-black/80 backdrop-blur-md z-10">
-        <div className="flex items-center gap-4">
+      <Navbar />
+
+      <div className="max-w-7xl mx-auto w-full px-6 md:px-8 pt-8">
+        <div className="flex items-center gap-4 mb-6">
           <Link href="/" className="p-2 hover:bg-white/10 rounded-full transition">
             <ArrowLeft className="w-5 h-5" />
           </Link>
@@ -24,11 +25,10 @@ export default function ReadPage() {
             <p className="text-sm text-gray-400">Explore the multiverse of stories</p>
           </div>
         </div>
-        <AuthModal />
-      </header>
+      </div>
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl mx-auto w-full p-6 md:p-8">
+      <main className="flex-1 max-w-7xl mx-auto w-full px-6 md:px-8 pb-8">
         <StoriesFeed />
       </main>
     </div>

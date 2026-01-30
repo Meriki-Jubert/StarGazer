@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Save, User } from "lucide-react";
 import Experience from "@/components/3d/Experience";
+import Navbar from '@/components/layout/Navbar';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -63,7 +64,9 @@ export default function ProfilePage() {
         <div className="absolute inset-0 bg-black/80" />
       </div>
 
-      <div className="max-w-xl mx-auto p-6 pt-20">
+      <Navbar />
+
+      <div className="max-w-xl mx-auto p-6">
         <header className="flex items-center gap-4 mb-8">
             <Link href="/" className="p-2 hover:bg-white/10 rounded-full transition">
                 <ArrowLeft className="w-6 h-6" />

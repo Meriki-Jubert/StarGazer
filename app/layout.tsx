@@ -17,6 +17,13 @@ export const metadata: Metadata = {
   description: "Read, write, and chat with AI fans in a 3D world.",
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
