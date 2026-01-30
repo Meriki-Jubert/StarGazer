@@ -33,17 +33,17 @@ export default function Actions({ storyId }: { storyId: string }) {
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1">
       <button
         onClick={handleShare}
-        className="p-2 hover:bg-white/10 rounded-full text-gray-400 hover:text-white transition tooltip"
+        className="p-3 hover:bg-white/10 rounded-full text-gray-400 hover:text-white transition tooltip min-w-[44px] min-h-[44px] flex items-center justify-center"
         title="Share link"
       >
         {copied ? <Check size={20} className="text-green-400" /> : <Share2 size={20} />}
       </button>
       <button
         onClick={handleBookmark}
-        className={`p-2 hover:bg-white/10 rounded-full transition ${
+        className={`p-3 hover:bg-white/10 rounded-full transition min-w-[44px] min-h-[44px] flex items-center justify-center ${
           bookmarked ? "text-purple-400 fill-purple-400" : "text-gray-400 hover:text-white"
         }`}
         title={bookmarked ? "Remove Bookmark" : "Bookmark Story"}

@@ -102,40 +102,51 @@ function StoryContent({ id }: { id: string }) {
       </div>
 
       <div className="flex-1 flex flex-col max-w-4xl mx-auto border-r border-white/10 bg-black/50 backdrop-blur-sm overflow-x-hidden">
-        <header className="p-4 md:p-6 border-b border-white/10 flex items-center justify-between sticky top-0 bg-black/80 backdrop-blur-md z-10 font-sans">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="p-2 hover:bg-white/10 rounded-full transition">
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <div className="min-w-0">
-              <h1 className="text-lg md:text-xl font-bold text-white truncate">{story.title}</h1>
-              <p className="text-xs text-purple-300 font-medium mb-1 truncate">
-                By {story.author?.username || "Unknown Author"}
-              </p>
-              <div className="flex flex-wrap gap-2 mt-1">
+        <header className="sticky top-0 z-30 bg-black/90 backdrop-blur-md border-b border-white/10 shadow-lg transition-all duration-300">
+          <div className="flex flex-col w-full">
+            {/* Row 1: Nav + Title + Actions */}
+            <div className="flex items-center justify-between p-2 pl-2 md:p-4 gap-2">
+              {/* Left: Back + Title Context */}
+              <div className="flex items-center gap-2 min-w-0 flex-1">
+                <Link href="/" className="p-3 hover:bg-white/10 rounded-full transition text-gray-400 hover:text-white shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center">
+                  <ArrowLeft className="w-5 h-5" />
+                </Link>
+                <div className="min-w-0 flex-1">
+                  <h1 className="text-base md:text-xl font-bold text-white truncate leading-tight">
+                    {story.title}
+                  </h1>
+                  <p className="text-xs text-purple-300 font-medium truncate">
+                    By {story.author?.username || "Unknown Author"}
+                  </p>
+                </div>
+              </div>
+
+              {/* Right: Actions + Menu */}
+              <div className="flex items-center gap-0.5 shrink-0">
+                <Actions storyId={story.id} />
+                <button
+                  onClick={() => setShowChapters(!showChapters)}
+                  className={`p-3 hover:bg-white/10 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center ${showChapters ? 'text-purple-400' : 'text-gray-400'}`}
+                  title={showChapters ? "Hide Sidebar" : "Show Sidebar"}
+                >
+                  <Menu size={20} />
+                </button>
+              </div>
+            </div>
+
+            {/* Row 2: Genres + Rating (Compact) */}
+            <div className="flex items-center justify-between px-4 pb-3 gap-4">
+              <div className="flex items-center gap-2 overflow-x-auto flex-1 pb-1">
                 {story.genres?.map((g, i) => (
-                  <span key={i} className="text-xs px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-200 border border-purple-500/30">
+                  <span key={i} className="text-[10px] uppercase tracking-wider px-2 py-1 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20 whitespace-nowrap shrink-0">
                     {g}
                   </span>
                 ))}
               </div>
-              <div className="mt-2">
+              <div className="shrink-0 z-40">
                 <Rating storyId={story.id} />
               </div>
-              <p className="text-sm text-gray-400 mt-1">
-                {currentChapter ? currentChapter.title : "Introduction"}
-              </p>
             </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <Actions storyId={story.id} />
-            <button
-              onClick={() => setShowChapters(!showChapters)}
-              className={`p-2 hover:bg-white/10 rounded transition-colors ${showChapters ? 'text-purple-400' : 'text-gray-400'}`}
-              title={showChapters ? "Hide Sidebar" : "Show Sidebar"}
-            >
-              <Menu />
-            </button>
           </div>
         </header>
 
