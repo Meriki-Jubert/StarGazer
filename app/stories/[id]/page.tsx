@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, ChevronRight, Menu, BookOpen, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronRight, Menu, BookOpen, ChevronDown } from "lucide-react";
 import { useEffect, useState, Suspense, use } from "react";
 import { getStory, type Story } from "@/lib/stories";
 import Experience from "@/components/3d/Experience";
@@ -46,7 +46,10 @@ function StoryContent({ id }: { id: string }) {
   useEffect(() => {
     // Open sidebar by default on large screens
     if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
-      setShowChapters(true);
+      // Defer state update to avoid synchronous render warning
+      setTimeout(() => {
+        setShowChapters(prev => (!prev ? true : prev));
+      }, 0);
     }
   }, []);
 
@@ -61,16 +64,23 @@ function StoryContent({ id }: { id: string }) {
     if (isDefaultView) {
       const savedIndex = localStorage.getItem(`last_read_${id}`);
       if (savedIndex !== null) {
-        setLastReadIndex(parseInt(savedIndex));
+        const parsedIndex = parseInt(savedIndex);
+        if (lastReadIndex !== parsedIndex) {
+          // Defer state update to avoid synchronous render warning
+          setTimeout(() => setLastReadIndex(parsedIndex), 0);
+        }
         return;
       }
     }
 
     // Otherwise (user navigated to specific chapter, or no history exists), save progress
     localStorage.setItem(`last_read_${id}`, currentChapterIndex.toString());
-    setLastReadIndex(currentChapterIndex);
+    if (lastReadIndex !== currentChapterIndex) {
+      // Defer state update to avoid synchronous render warning
+      setTimeout(() => setLastReadIndex(currentChapterIndex), 0);
+    }
     
-  }, [currentChapterIndex, id, story, searchParams]);
+  }, [currentChapterIndex, id, story, searchParams, lastReadIndex]);
 
   const navigateToChapter = (index: number) => {
     const params = new URLSearchParams(searchParams);

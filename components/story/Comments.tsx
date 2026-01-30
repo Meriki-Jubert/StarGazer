@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getComments, addComment, type Comment } from "@/lib/stories";
 import { Send } from "lucide-react";
 
@@ -9,14 +9,14 @@ export default function Comments({ storyId }: { storyId: string }) {
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    loadComments();
-  }, [storyId]);
-
-  const loadComments = async () => {
+  const loadComments = useCallback(async () => {
     const data = await getComments(storyId);
     setComments(data);
-  };
+  }, [storyId]);
+
+  useEffect(() => {
+    loadComments();
+  }, [loadComments]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

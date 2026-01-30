@@ -13,7 +13,6 @@ export default function DashboardPage() {
   const router = useRouter();
   const [stories, setStories] = useState<Story[]>([]);
   const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchUserAndStories() {
@@ -22,7 +21,6 @@ export default function DashboardPage() {
         router.push("/");
         return;
       }
-      setUserId(user.id);
       const data = await getUserStories(user.id);
       setStories(data);
       setLoading(false);
