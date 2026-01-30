@@ -101,15 +101,15 @@ function StoryContent({ id }: { id: string }) {
         <div className="absolute inset-0 bg-black/80" />
       </div>
 
-      <div className="flex-1 flex flex-col max-w-4xl mx-auto border-r border-white/10 bg-black/50 backdrop-blur-sm">
-        <header className="p-6 border-b border-white/10 flex items-center justify-between sticky top-0 bg-black/80 backdrop-blur-md z-10 font-sans">
+      <div className="flex-1 flex flex-col max-w-4xl mx-auto border-r border-white/10 bg-black/50 backdrop-blur-sm overflow-x-hidden">
+        <header className="p-4 md:p-6 border-b border-white/10 flex items-center justify-between sticky top-0 bg-black/80 backdrop-blur-md z-10 font-sans">
           <div className="flex items-center gap-4">
             <Link href="/" className="p-2 hover:bg-white/10 rounded-full transition">
               <ArrowLeft className="w-5 h-5" />
             </Link>
-            <div>
-              <h1 className="text-xl font-bold text-white">{story.title}</h1>
-              <p className="text-xs text-purple-300 font-medium mb-1">
+            <div className="min-w-0">
+              <h1 className="text-lg md:text-xl font-bold text-white truncate">{story.title}</h1>
+              <p className="text-xs text-purple-300 font-medium mb-1 truncate">
                 By {story.author?.username || "Unknown Author"}
               </p>
               <div className="flex flex-wrap gap-2 mt-1">
@@ -139,16 +139,16 @@ function StoryContent({ id }: { id: string }) {
           </div>
         </header>
 
-        <article className="flex-1 overflow-y-auto p-8 md:p-12">
+        <article className="flex-1 overflow-y-auto p-4 md:p-8 lg:p-12">
           {/* Resume Banner */}
           {lastReadIndex !== null && lastReadIndex > currentChapterIndex && story.chapters[lastReadIndex] && (
              <div className="mb-8 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg flex items-center justify-between">
-                <div>
-                   <p className="text-sm text-blue-200">You left off at <span className="font-bold">{story.chapters[lastReadIndex].title}</span></p>
+                <div className="min-w-0 mr-4">
+                   <p className="text-sm text-blue-200 truncate">You left off at <span className="font-bold">{story.chapters[lastReadIndex].title}</span></p>
                 </div>
                 <button 
                   onClick={() => navigateToChapter(lastReadIndex)}
-                  className="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded transition"
+                  className="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded transition shrink-0"
                 >
                   Resume
                 </button>
@@ -157,8 +157,8 @@ function StoryContent({ id }: { id: string }) {
 
           {story.chapters.length > 0 ? (
             currentChapter ? (
-              <div className="prose prose-invert prose-lg max-w-none">
-                <h2 className="text-3xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-purple-200 to-blue-200">
+              <div className="prose prose-invert lg:prose-lg max-w-none">
+                <h2 className="text-2xl md:text-3xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-purple-200 to-blue-200">
                   {currentChapter.title}
                 </h2>
                 <RichTextEditor
@@ -210,9 +210,17 @@ function StoryContent({ id }: { id: string }) {
         </article>
       </div>
 
-      {/* Sidebar (Desktop) */}
+      {/* Mobile Sidebar Overlay */}
+      {showChapters && (
+        <div 
+          className="fixed inset-0 bg-black/80 z-20 lg:hidden"
+          onClick={() => setShowChapters(false)}
+        />
+      )}
+
+      {/* Sidebar (Desktop & Mobile) */}
       <div className={`
-        fixed inset-y-0 right-0 z-20 w-80 bg-black/90 backdrop-blur-xl border-l border-white/10 transform transition-all duration-300 ease-in-out
+        fixed inset-y-0 right-0 z-30 w-80 bg-black/90 backdrop-blur-xl border-l border-white/10 transform transition-transform duration-300 ease-in-out
         lg:sticky lg:top-0 lg:h-screen lg:bg-black/60 flex flex-col
         ${showChapters 
           ? 'translate-x-0 lg:w-96 lg:translate-x-0 opacity-100' 

@@ -41,70 +41,68 @@ export default function RichTextEditor({ content, onChange, editable = true }: R
   return (
     <div className="flex flex-col gap-2">
       {editable && (
-        <div className="flex flex-wrap items-center gap-1 p-2 bg-white/5 border border-white/10 rounded-t-lg">
+        <div className="flex flex-wrap items-center gap-2 p-2 bg-white/5 border border-white/10 rounded-t-lg">
           <button
             onClick={() => editor.chain().focus().toggleBold().run()}
-            className={`p-2 rounded hover:bg-white/10 ${editor.isActive('bold') ? 'bg-purple-500/50 text-purple-200' : 'text-gray-400'}`}
+            className={`p-3 rounded hover:bg-white/10 ${editor.isActive('bold') ? 'bg-purple-500/50 text-purple-200' : 'text-gray-400'}`}
             title="Bold"
           >
-            <Bold size={18} />
+            <Bold size={20} />
           </button>
           <button
             onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={`p-2 rounded hover:bg-white/10 ${editor.isActive('italic') ? 'bg-purple-500/50 text-purple-200' : 'text-gray-400'}`}
+            className={`p-3 rounded hover:bg-white/10 ${editor.isActive('italic') ? 'bg-purple-500/50 text-purple-200' : 'text-gray-400'}`}
             title="Italic"
           >
-            <Italic size={18} />
+            <Italic size={20} />
           </button>
           <button
             onClick={() => editor.chain().focus().toggleStrike().run()}
-            className={`p-2 rounded hover:bg-white/10 ${editor.isActive('strike') ? 'bg-purple-500/50 text-purple-200' : 'text-gray-400'}`}
+            className={`p-3 rounded hover:bg-white/10 ${editor.isActive('strike') ? 'bg-purple-500/50 text-purple-200' : 'text-gray-400'}`}
             title="Strikethrough"
           >
-            <Strikethrough size={18} />
+            <Strikethrough size={20} />
           </button>
-          <div className="w-px h-6 bg-white/10 mx-1" />
+          <div className="w-px h-8 bg-white/10 mx-1" />
           <button
             onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-            className={`p-2 rounded hover:bg-white/10 ${editor.isActive('heading', { level: 1 }) ? 'bg-purple-500/50 text-purple-200' : 'text-gray-400'}`}
+            className={`p-3 rounded hover:bg-white/10 ${editor.isActive('heading', { level: 1 }) ? 'bg-purple-500/50 text-purple-200' : 'text-gray-400'}`}
             title="Heading 1"
           >
-            <Heading1 size={18} />
+            <Heading1 size={20} />
           </button>
           <button
             onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-            className={`p-2 rounded hover:bg-white/10 ${editor.isActive('heading', { level: 2 }) ? 'bg-purple-500/50 text-purple-200' : 'text-gray-400'}`}
+            className={`p-3 rounded hover:bg-white/10 ${editor.isActive('heading', { level: 2 }) ? 'bg-purple-500/50 text-purple-200' : 'text-gray-400'}`}
             title="Heading 2"
           >
-            <Heading2 size={18} />
+            <Heading2 size={20} />
           </button>
-          <div className="w-px h-6 bg-white/10 mx-1" />
+          <div className="w-px h-8 bg-white/10 mx-1" />
           <button
             onClick={() => editor.chain().focus().toggleBulletList().run()}
-            className={`p-2 rounded hover:bg-white/10 ${editor.isActive('bulletList') ? 'bg-purple-500/50 text-purple-200' : 'text-gray-400'}`}
+            className={`p-3 rounded hover:bg-white/10 ${editor.isActive('bulletList') ? 'bg-purple-500/50 text-purple-200' : 'text-gray-400'}`}
             title="Bullet List"
           >
-            <List size={18} />
+            <List size={20} />
           </button>
           <button
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            className={`p-2 rounded hover:bg-white/10 ${editor.isActive('orderedList') ? 'bg-purple-500/50 text-purple-200' : 'text-gray-400'}`}
+            className={`p-3 rounded hover:bg-white/10 ${editor.isActive('orderedList') ? 'bg-purple-500/50 text-purple-200' : 'text-gray-400'}`}
             title="Ordered List"
           >
-            <ListOrdered size={18} />
+            <ListOrdered size={20} />
           </button>
           <button
             onClick={() => editor.chain().focus().toggleBlockquote().run()}
-            className={`p-2 rounded hover:bg-white/10 ${editor.isActive('blockquote') ? 'bg-purple-500/50 text-purple-200' : 'text-gray-400'}`}
+            className={`p-3 rounded hover:bg-white/10 ${editor.isActive('blockquote') ? 'bg-purple-500/50 text-purple-200' : 'text-gray-400'}`}
             title="Blockquote"
           >
-            <Quote size={18} />
+            <Quote size={20} />
           </button>
         </div>
       )}
-      <div className={`p-4 bg-white/5 border border-white/10 ${editable ? 'rounded-b-lg' : 'rounded-lg'}`}>
-        <EditorContent editor={editor} />
-      </div>
+      <EditorContent editor={editor} className="bg-transparent rounded-b-lg border border-white/10 p-4 min-h-[300px]" />
     </div>
   );
 }

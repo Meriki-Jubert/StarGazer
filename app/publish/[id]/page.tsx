@@ -4,7 +4,7 @@ import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import { getStory, addChapter, updateChapter, updateStory, Story } from "@/lib/stories";
 import Link from "next/link";
-import { ArrowLeft, Plus, Save, Settings, FileText, ChevronRight, X } from "lucide-react";
+import { ArrowLeft, Plus, Save, Settings, FileText, ChevronRight, X, Menu } from "lucide-react";
 import RichTextEditor from "@/components/editor/RichTextEditor";
 import AiChat from "@/components/chat/AiChat";
 
@@ -26,6 +26,9 @@ export default function StoryEditorPage({ params }: { params: Promise<{ id: stri
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [editGenres, setEditGenres] = useState<string[]>([]);
+  
+  // Mobile Sidebar State
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const GENRES = [
     "Fantasy", "Sci-Fi", "Mystery", "Romance", "Horror", "Adventure",
@@ -130,24 +133,44 @@ export default function StoryEditorPage({ params }: { params: Promise<{ id: stri
     }
   };
 
-  if (loading) return <div className="text-white p-10">Loading Editor...</div>;
-  if (!story) return null;
+  if (loading) return <div className="p-10 text-white">Loading editor...</div>;
+  if (!story) return <div className="p-10 text-white">Story not found.</div>;
 
   const activeChapter = story.chapters.find(c => c.id === activeChapterId);
 
   return (
-    <div className="flex h-screen bg-[#111] text-gray-200 overflow-hidden font-sans">
-      {/* Sidebar */}
-      <div className="w-80 flex-shrink-0 border-r border-white/10 bg-black/40 flex flex-col">
-        <div className="p-4 border-b border-white/10">
-          <Link href="/" className="flex items-center text-sm text-gray-400 hover:text-white mb-4">
-            <ArrowLeft size={14} className="mr-1" /> Back to Home
+    <div className="flex h-screen bg-black text-gray-200 font-sans overflow-hidden">
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/80 z-40 lg:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar - Collapsible on Mobile */}
+      <div className={`
+        fixed lg:static inset-y-0 left-0 z-50 w-64 bg-black/50 backdrop-blur-md border-r border-white/10 flex flex-col transition-transform duration-300 transform 
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
+        <div className="p-4 border-b border-white/10 flex items-center justify-between">
+          <Link href="/dashboard" className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
+            <ArrowLeft size={16} /> Back to Dashboard
           </Link>
-          <h1 className="font-bold text-lg truncate text-purple-200" title={story.title}>{story.title}</h1>
-          <p className="text-xs text-gray-500 truncate">{story.chapters.length} Chapters</p>
+          <button 
+            onClick={() => setIsSidebarOpen(false)}
+            className="lg:hidden p-1 text-gray-400 hover:text-white"
+          >
+            <X size={20} />
+          </button>
+        </div>
+        
+        <div className="p-6">
+          <h1 className="text-xl font-bold text-white mb-1 line-clamp-1">{story.title}</h1>
+          <p className="text-xs text-purple-300 font-medium">{story.chapters.length} Chapters</p>
         </div>
 
-        <div className="p-4">
+        <div className="px-4">
           <button 
             onClick={() => setShowSettings(true)}
             className="w-full flex items-center justify-center gap-2 py-2 border border-white/10 rounded-lg hover:bg-white/5 transition-colors text-sm mb-6"
@@ -201,34 +224,42 @@ export default function StoryEditorPage({ params }: { params: Promise<{ id: stri
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col h-screen overflow-hidden relative">
+      <div className="flex-1 flex flex-col h-screen overflow-hidden relative w-full">
         {activeChapter ? (
           <>
             {/* Toolbar */}
-            <div className="h-16 border-b border-white/10 flex items-center justify-between px-8 bg-black/20">
-              <input
-                type="text"
-                value={chapterTitle}
-                onChange={(e) => setChapterTitle(e.target.value)}
-                className="bg-transparent text-xl font-bold text-white focus:outline-none placeholder-gray-600 w-full max-w-lg"
-                placeholder="Chapter Title"
-              />
+            <div className="h-16 border-b border-white/10 flex items-center justify-between px-4 lg:px-8 bg-black/20 shrink-0">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <button
+                  onClick={() => setIsSidebarOpen(true)}
+                  className="lg:hidden p-2 text-gray-400 hover:text-white mr-2"
+                >
+                  <Menu size={20} />
+                </button>
+                <input
+                  type="text"
+                  value={chapterTitle}
+                  onChange={(e) => setChapterTitle(e.target.value)}
+                  className="bg-transparent text-lg lg:text-xl font-bold text-white focus:outline-none placeholder-gray-600 w-full max-w-lg truncate"
+                  placeholder="Chapter Title"
+                />
+              </div>
               
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-gray-500 uppercase tracking-wider mr-2">
+              <div className="flex items-center gap-2 lg:gap-3 shrink-0">
+                <span className="hidden sm:inline text-xs text-gray-500 uppercase tracking-wider mr-2">
                   {isSaving ? "Saving..." : "Unsaved changes"}
                 </span>
                 <button 
                   onClick={handleSaveChapter}
-                  className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-medium transition-all text-sm"
+                  className="flex items-center gap-2 px-3 lg:px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-medium transition-all text-sm"
                 >
-                  <Save size={16} /> Save
+                  <Save size={16} /> <span className="hidden sm:inline">Save</span>
                 </button>
               </div>
             </div>
 
             {/* Editor Area */}
-            <div className="flex-1 overflow-y-auto p-8 max-w-4xl mx-auto w-full">
+            <div className="flex-1 overflow-y-auto p-4 lg:p-8 max-w-4xl mx-auto w-full">
               <RichTextEditor 
                 key={activeChapterId}
                 content={chapterContent} 
@@ -239,12 +270,18 @@ export default function StoryEditorPage({ params }: { params: Promise<{ id: stri
             </div>
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center text-gray-500">
+          <div className="flex-1 flex flex-col items-center justify-center text-gray-500 p-4 text-center">
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              className="lg:hidden absolute top-4 left-4 p-2 text-gray-400 hover:text-white"
+            >
+              <Menu size={24} />
+            </button>
             <div className="p-4 bg-white/5 rounded-full mb-4">
               <FileText size={48} className="opacity-20" />
             </div>
             <h2 className="text-xl font-medium mb-2">No Chapter Selected</h2>
-            <p className="mb-6">Select a chapter from the sidebar or create a new one.</p>
+            <p className="mb-6 max-w-xs">Select a chapter from the sidebar or create a new one.</p>
             <button 
               onClick={handleAddChapter}
               className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all"
