@@ -47,14 +47,93 @@ export type Bookmark = {
   created_at: string;
 };
 
+export type Profile = {
+  id: string;
+  username: string;
+  full_name?: string;
+  avatar_url?: string;
+  banner_url?: string;
+  website?: string;
+  bio?: string;
+  social_links?: { platform: string; url: string; is_public?: boolean }[];
+  custom_sections?: { id: string; title: string; content: string; order: number; is_public?: boolean }[];
+  privacy_settings?: {
+    show_stats: boolean;
+  };
+  created_at: string;
+};
+
 // --- READ Operations ---
 
-export async function getStories(limit = 20): Promise<Story[]> {
+export async function getProfile(username: string): Promise<Profile | null> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('username', username)
+    .single();
+
+  if (error) {
+    console.error("Error fetching profile:", error);
+    return null;
+  }
+  return data;
+}
+
+export async function getStoriesByUsername(username: string): Promise<Story[]> {
+  // First get the user ID from the username
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('username', username)
+    .single();
+
+  if (profileError || !profile) {
+    console.error("Error fetching user for stories:", profileError);
+    return [];
+  }
+
   const { data: stories, error } = await supabase
+    .from('stories')
+    .select('*, chapters(*), author:profiles(username)')
+    .eq('user_id', profile.id)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error("Error fetching author stories:", error);
+    return [];
+  }
+
+  return stories.map(s => ({
+    ...s,
+    chapters: (s.chapters || []).sort((a: Chapter, b: Chapter) => a.order - b.order)
+  }));
+}
+
+export interface GetStoriesOptions {
+  limit?: number;
+  genres?: string[];
+  search?: string;
+}
+
+export async function getStories(options: number | GetStoriesOptions = 20): Promise<Story[]> {
+  const limit = typeof options === 'number' ? options : (options.limit || 20);
+  const { genres, search } = typeof options === 'object' ? options : { genres: undefined, search: undefined };
+
+  let query = supabase
     .from('stories')
     .select('*, chapters(*), author:profiles(username)')
     .order('created_at', { ascending: false })
     .limit(limit);
+
+  if (genres && genres.length > 0) {
+    query = query.overlaps('genres', genres);
+  }
+
+  if (search) {
+    query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
+  }
+
+  const { data: stories, error } = await query;
 
   if (error) {
     console.error("Error fetching stories:", error);
@@ -355,13 +434,18 @@ export async function getBookmarkedStories(): Promise<Story[]> {
 
 // --- Profiles ---
 
-export async function updateProfile(username: string): Promise<boolean> {
+export async function updateProfile(username: string, updates?: Partial<Profile>): Promise<boolean> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return false;
 
   const { error } = await supabase
     .from('profiles')
-    .upsert({ id: user.id, username, updated_at: new Date().toISOString() });
+    .upsert({ 
+      id: user.id, 
+      username, 
+      ...updates,
+      updated_at: new Date().toISOString() 
+    });
 
   if (error) {
     console.error("Error updating profile:", error);
@@ -370,13 +454,13 @@ export async function updateProfile(username: string): Promise<boolean> {
   return true;
 }
 
-export async function getProfile(): Promise<{ username: string } | null> {
+export async function getCurrentUserProfile(): Promise<Profile | null> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
   const { data, error } = await supabase
     .from('profiles')
-    .select('username')
+    .select('*')
     .eq('id', user.id)
     .maybeSingle();
     

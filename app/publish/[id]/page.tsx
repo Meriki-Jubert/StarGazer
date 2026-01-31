@@ -7,6 +7,7 @@ import Link from "next/link";
 import { ArrowLeft, Plus, Save, Settings, FileText, ChevronRight, X, Menu } from "lucide-react";
 import RichTextEditor from "@/components/editor/RichTextEditor";
 import AiChat from "@/components/chat/AiChat";
+import { GENRE_CATEGORIES } from "@/lib/genres";
 
 export default function StoryEditorPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -29,13 +30,6 @@ export default function StoryEditorPage({ params }: { params: Promise<{ id: stri
   
   // Mobile Sidebar State
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  const GENRES = [
-    "Fantasy", "Sci-Fi", "Mystery", "Romance", "Horror", "Adventure",
-    "Thriller", "Historical Fiction", "Young Adult", "Dystopian",
-    "Paranormal", "Cyberpunk", "Steampunk", "Space Opera", "High Fantasy",
-    "Urban Fantasy", "Crime", "Comedy", "Drama", "Poetry"
-  ];
 
   useEffect(() => {
     async function fetchStory() {
@@ -341,20 +335,29 @@ export default function StoryEditorPage({ params }: { params: Promise<{ id: stri
 
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">Genres</label>
-                <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-2 border border-white/5 rounded-lg">
-                  {GENRES.map(genre => (
-                    <button
-                      key={genre}
-                      type="button"
-                      onClick={() => toggleGenre(genre)}
-                      className={`px-3 py-1 rounded-full text-xs border transition-all ${
-                        editGenres.includes(genre)
-                          ? "bg-purple-600 border-purple-500 text-white"
-                          : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10"
-                      }`}
-                    >
-                      {genre}
-                    </button>
+                <div className="max-h-60 overflow-y-auto p-4 bg-white/5 rounded-lg border border-white/10 space-y-4">
+                  {GENRE_CATEGORIES.map((category) => (
+                    <div key={category.name}>
+                      <h3 className="text-xs font-bold text-purple-300 uppercase tracking-wider mb-2 sticky top-0 bg-black/40 backdrop-blur-sm py-1 z-10">
+                        {category.name}
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {category.genres.map((genre) => (
+                          <button
+                            key={genre}
+                            type="button"
+                            onClick={() => toggleGenre(genre)}
+                            className={`px-3 py-1 rounded-full text-xs border transition-all ${
+                              editGenres.includes(genre)
+                                ? "bg-purple-600 border-purple-500 text-white"
+                                : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10"
+                            }`}
+                          >
+                            {genre}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>

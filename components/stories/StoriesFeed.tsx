@@ -1,20 +1,25 @@
 "use client";
 import Link from "next/link";
-import { getStories, Story } from "@/lib/stories";
+import { getStories, Story, GetStoriesOptions } from "@/lib/stories";
 import { useEffect, useState } from "react";
 
-export default function StoriesFeed({ limit }: { limit?: number }) {
+export default function StoriesFeed({ limit, filterOptions }: { limit?: number; filterOptions?: Omit<GetStoriesOptions, 'limit'> }) {
   const [stories, setStories] = useState<Story[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchStories() {
-      const data = await getStories(limit ?? 10);
+      setLoading(true);
+      const options: GetStoriesOptions = {
+        limit: limit ?? 10,
+        ...filterOptions
+      };
+      const data = await getStories(options);
       setStories(data);
       setLoading(false);
     }
     fetchStories();
-  }, [limit]);
+  }, [limit, filterOptions?.genres, filterOptions?.search]); // Deep comparison for primitives, array ref change triggers update
 
   if (loading) {
     return <p className="text-gray-400">Loading stories...</p>;

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, ChevronRight, Menu, BookOpen, ChevronDown } from "lucide-react";
 import { useEffect, useState, Suspense, use } from "react";
 import { getStory, type Story } from "@/lib/stories";
+import { isSensitiveGenre, getGenreWarning } from "@/lib/genres";
 import Experience from "@/components/3d/Experience";
 import AiChat from "@/components/chat/AiChat";
 import RichTextEditor from "@/components/editor/RichTextEditor";
@@ -11,6 +12,7 @@ import Rating from "@/components/story/Rating";
 import Comments from "@/components/story/Comments";
 import Actions from "@/components/story/Actions";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { AlertTriangle, EyeOff, Eye } from "lucide-react";
 
 function StoryContent({ id }: { id: string }) {
   const [story, setStory] = useState<Story | null>(null);
@@ -19,6 +21,7 @@ function StoryContent({ id }: { id: string }) {
   const [lastReadIndex, setLastReadIndex] = useState<number | null>(null);
   const [isTocOpen, setIsTocOpen] = useState(true);
   const [isChatOpen, setIsChatOpen] = useState(true);
+  const [acceptedWarning, setAcceptedWarning] = useState(false);
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -92,6 +95,60 @@ function StoryContent({ id }: { id: string }) {
   if (loading) return <div className="p-10 text-white">Loading story...</div>;
   if (!story) return <div className="p-10 text-white">Story not found.</div>;
 
+  // Check for sensitive content
+  const sensitiveGenres = story.genres?.filter(isSensitiveGenre) || [];
+  const hasSensitiveContent = sensitiveGenres.length > 0;
+  const warnings = Array.from(new Set(sensitiveGenres.map(getGenreWarning).filter(Boolean)));
+
+  if (hasSensitiveContent && !acceptedWarning) {
+    return (
+      <div className="relative min-h-screen flex items-center justify-center text-gray-200 font-sans p-6">
+        <div className="fixed inset-0 -z-10">
+          <Experience />
+          <div className="absolute inset-0 bg-black/90" />
+        </div>
+        
+        <div className="max-w-md w-full bg-gray-900/90 border border-red-500/30 p-8 rounded-2xl backdrop-blur-xl shadow-2xl">
+          <div className="flex flex-col items-center text-center gap-4">
+            <div className="p-4 bg-red-500/10 rounded-full text-red-500">
+              <AlertTriangle size={48} />
+            </div>
+            <h2 className="text-2xl font-bold text-white">Content Warning</h2>
+            
+            <div className="space-y-4 text-gray-300">
+              <p>This story contains sensitive themes:</p>
+              <div className="flex flex-wrap justify-center gap-2">
+                {sensitiveGenres.map(g => (
+                  <span key={g} className="px-3 py-1 rounded-full bg-red-500/20 text-red-300 text-sm font-medium border border-red-500/30">
+                    {g}
+                  </span>
+                ))}
+              </div>
+              
+              {warnings.map((w, i) => (
+                <p key={i} className="text-sm italic text-red-200/80 bg-red-950/30 p-3 rounded-lg border border-red-500/10">
+                  {w}
+                </p>
+              ))}
+            </div>
+
+            <div className="flex gap-4 w-full mt-4">
+              <Link href="/" className="flex-1 py-3 px-4 rounded-xl bg-gray-800 hover:bg-gray-700 text-white font-medium transition text-center">
+                Go Back
+              </Link>
+              <button 
+                onClick={() => setAcceptedWarning(true)}
+                className="flex-1 py-3 px-4 rounded-xl bg-red-600 hover:bg-red-500 text-white font-medium transition"
+              >
+                I Understand, Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const currentChapter = story.chapters[currentChapterIndex];
 
   return (
@@ -115,9 +172,18 @@ function StoryContent({ id }: { id: string }) {
                   <h1 className="text-base md:text-xl font-bold text-white truncate leading-tight">
                     {story.title}
                   </h1>
-                  <p className="text-xs text-purple-300 font-medium truncate">
-                    By {story.author?.username || "Unknown Author"}
-                  </p>
+                  {story.author?.username ? (
+                    <Link 
+                      href={`/author/${encodeURIComponent(story.author.username)}`}
+                      className="text-xs text-purple-300 font-medium truncate hover:text-purple-200 hover:underline transition-colors block"
+                    >
+                      By {story.author.username}
+                    </Link>
+                  ) : (
+                    <p className="text-xs text-purple-300 font-medium truncate">
+                      By Unknown Author
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -138,9 +204,13 @@ function StoryContent({ id }: { id: string }) {
             <div className="flex items-center justify-between px-4 pb-3 gap-4">
               <div className="flex items-center gap-2 overflow-x-auto flex-1 pb-1">
                 {story.genres?.map((g, i) => (
-                  <span key={i} className="text-[10px] uppercase tracking-wider px-2 py-1 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20 whitespace-nowrap shrink-0">
+                  <Link 
+                    key={i} 
+                    href={`/read?genres=${encodeURIComponent(g)}`}
+                    className="text-[10px] uppercase tracking-wider px-2 py-1 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20 whitespace-nowrap shrink-0 hover:bg-purple-500/20 transition-colors"
+                  >
                     {g}
-                  </span>
+                  </Link>
                 ))}
               </div>
               <div className="shrink-0 z-40">

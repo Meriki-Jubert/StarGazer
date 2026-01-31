@@ -6,6 +6,7 @@ import { createStory } from "@/lib/stories";
 import Link from "next/link";
 import { ArrowLeft, BookOpen } from "lucide-react";
 import Experience from "@/components/3d/Experience";
+import { GENRE_CATEGORIES } from "@/lib/genres";
 
 export default function CreateStoryPage() {
   const router = useRouter();
@@ -13,13 +14,6 @@ export default function CreateStoryPage() {
   const [description, setDescription] = useState("");
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-
-  const GENRES = [
-    "Fantasy", "Sci-Fi", "Mystery", "Romance", "Horror", "Adventure",
-    "Thriller", "Historical Fiction", "Young Adult", "Dystopian",
-    "Paranormal", "Cyberpunk", "Steampunk", "Space Opera", "High Fantasy",
-    "Urban Fantasy", "Crime", "Comedy", "Drama", "Poetry"
-  ];
 
   const toggleGenre = (genre: string) => {
     setSelectedGenres(prev =>
@@ -106,19 +100,29 @@ export default function CreateStoryPage() {
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Genres (Select multiple)
             </label>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-48 overflow-y-auto p-2 bg-white/5 rounded-lg border border-white/10">
-              {GENRES.map(genre => (
-                <button
-                  key={genre}
-                  type="button"
-                  onClick={() => toggleGenre(genre)}
-                  className={`px-3 py-2 rounded text-sm text-left transition-all ${selectedGenres.includes(genre)
-                      ? "bg-purple-600 text-white shadow-lg shadow-purple-900/50"
-                      : "text-gray-400 hover:bg-white/10 hover:text-white"
-                    }`}
-                >
-                  {genre}
-                </button>
+            <div className="max-h-64 overflow-y-auto p-4 bg-white/5 rounded-lg border border-white/10 space-y-4">
+              {GENRE_CATEGORIES.map((category) => (
+                <div key={category.name}>
+                  <h3 className="text-xs font-bold text-purple-300 uppercase tracking-wider mb-2 sticky top-0 bg-black/40 backdrop-blur-sm py-1 z-10">
+                    {category.name}
+                  </h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                    {category.genres.map((genre) => (
+                      <button
+                        key={genre}
+                        type="button"
+                        onClick={() => toggleGenre(genre)}
+                        className={`px-3 py-2 rounded text-xs md:text-sm text-left transition-all ${
+                          selectedGenres.includes(genre)
+                            ? "bg-purple-600 text-white shadow-lg shadow-purple-900/50"
+                            : "text-gray-400 hover:bg-white/10 hover:text-white"
+                        }`}
+                      >
+                        {genre}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           </div>
